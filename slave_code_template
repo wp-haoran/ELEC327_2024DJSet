@@ -1,4 +1,154 @@
-#include <msp430.h> 
+////#include <msp430.h>
+////#include "msp430g2553.h"
+////
+////// Notes for a major C chord
+////int periods[] = {1000000/261.63,
+////   1000000/329.63,
+////   1000000/392.00,
+////   1000000/523.5};
+////int empty_periods[] = {0,
+////   0,
+////   0,
+////   0};
+////int current_period[] = &empty_periods;
+////int which_period = 0;
+////
+////volatile unsigned int i = 0;
+////void main(void) {
+////    WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
+////    BCSCTL3 |= LFXT1S_2;      // ACLK = VLO
+////    BCSCTL1 = CALBC1_1MHZ;    // Set the DCO to 1 MHz
+////    DCOCTL = CALDCO_1MHZ;     // And load calibration data
+////    P1DIR = BIT6;
+////    P2DIR |= BIT5; // We need P2.5 to be output
+////    P2DIR |= BIT1; // Set P2.1 as output
+////    P2SEL |= BIT5; // P2.5 is TA1.2 PWM output
+////    TA1CCR0 = periods[which_period];
+////    TA1CCR2 = periods[which_period]>>1; // divde by 2
+////    TA1CCTL2 = OUTMOD_7;
+////    TA1CTL = TASSEL_2 + MC_1; // SMCLK, upmode
+////
+////    WDTCTL = WDT_ADLY_250;  // Set Watchdog Timer to 1000 ms with VLO
+////    IE1 |= WDTIE;
+////    P1OUT |= BIT5;
+////    P1DIR |= BIT5;
+////
+////    P1SEL = BIT1 + BIT2 + BIT4 + BIT5;
+////    P1SEL2 = BIT1 + BIT2 + BIT4 + BIT5;
+////    UCA0CTL1 = UCSWRST;                       // **Put state machine in reset**
+////    UCA0CTL0 |= UCMSB + UCSYNC;               // 3-pin, 8-bit SPI master
+////    UCA0CTL1 &= ~UCSWRST;                     // **Initialize USCI state machine**
+////    IE2 |= UCA0RXIE;
+////
+////
+////
+////    __bis_SR_register(CPUOFF + GIE);
+////
+////
+////    while(1);
+////}
+////
+////#pragma vector=WDT_VECTOR
+////__interrupt void watchdog_timer(void)
+////{
+////  which_period = (which_period + 1) % 4;
+////  TA1CCR2 = periods[which_period]>>1;
+////  TA1CCR0 = periods[which_period];
+////}
+////
+////__attribute__((interrupt(USCIAB0RX_VECTOR))) void USCI0RX_ISR (void)
+////{
+////
+////  char value = UCA0RXBUF;
+////
+////  if (value == 0xAA){
+////      current_period = periods;
+////  }
+////
+////
+////
+////}
+//
+//
+//#include <msp430.h>
+//#include "msp430g2553.h"
+//
+//// Notes for a major C chord
+//int periods[] = {1000000/261.63,
+//   1000000/329.63,
+//   1000000/392.00,
+//   1000000/523.5};
+//int current_periods[] = {0,
+//   0,
+//   0,
+//   0};
+//
+//
+//int which_period = 0;
+//
+//volatile unsigned int i = 0;
+//void main(void) {
+//    WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
+//    BCSCTL3 |= LFXT1S_2;      // ACLK = VLO
+//    BCSCTL1 = CALBC1_1MHZ;    // Set the DCO to 1 MHz
+//    DCOCTL = CALDCO_1MHZ;     // And load calibration data
+//    P1DIR = BIT6;
+//    P2DIR |= BIT5; // We need P2.5 to be output
+//    P2DIR |= BIT1; // Set P2.1 as output
+//    P2SEL |= BIT5; // P2.5 is TA1.2 PWM output
+//    TA1CCR0 = periods[which_period];
+//    TA1CCR2 = periods[which_period]>>1; // divde by 2
+//    TA1CCTL2 = OUTMOD_7;
+//    TA1CTL = TASSEL_2 + MC_1; // SMCLK, upmode
+//
+//    WDTCTL = WDT_ADLY_250;  // Set Watchdog Timer to 1000 ms with VLO
+//    IE1 |= WDTIE;
+//    P1OUT |= BIT5;
+//    P1DIR |= BIT5;
+//
+//    P1SEL = BIT1 + BIT2 + BIT4 + BIT5;
+//    P1SEL2 = BIT1 + BIT2 + BIT4 + BIT5;
+//    UCA0CTL1 = UCSWRST;                       // Put state machine in reset
+//    UCA0CTL0 |= UCMSB + UCSYNC;               // 3-pin, 8-bit SPI master
+//    UCA0CTL1 &= ~UCSWRST;                     // Initialize USCI state machine
+//    IE2 |= UCA0RXIE;
+//
+//
+//
+//    __bis_SR_register(GIE);
+//
+//
+//    while(1);
+//}
+//
+//#pragma vector=WDT_VECTOR
+//__interrupt void watchdog_timer(void)
+//{
+//  which_period = (which_period + 1) % 4;
+//  TA1CCR2 = current_periods[which_period]>>1;
+//  TA1CCR0 = current_periods[which_period];
+//}
+//
+//__attribute ((interrupt(USCIAB0RX_VECTOR))) void USCI0RX_ISR (void)
+//{
+//
+//  char value = UCA0RXBUF;
+//
+//  if (value == 0xAA){
+//      current_periods[0] = periods[0];
+//      current_periods[1] = periods[1];
+//      current_periods[2] = periods[2];
+//      current_periods[3] = periods[3];
+//  }
+//  else if (value == 0xAB){
+//            current_periods[0] = 0;
+//            current_periods[1] = 0;
+//            current_periods[2] = 0;
+//            current_periods[3] = 0;
+//  }
+//}
+
+#include <msp430.h>
 
 
 volatile unsigned int i = 0;
@@ -6,6 +156,10 @@ void main(void) {
     WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
 
     P1DIR = BIT6;
+    P2DIR = BIT5;
+
+    P1OUT = 0;
+    P2OUT = 0;
 
     P1OUT |= BIT5;
     P1DIR |= BIT5;
@@ -30,13 +184,23 @@ __attribute__((interrupt(USCIAB0RX_VECTOR))) void USCI0RX_ISR (void)
   char value = UCA0RXBUF;
 
   if (value == 0xAA){
-      for (;;)
-          {
+//      for (;;)
+//          {
               P1OUT ^= BIT6;
-              for(i=0; i< 20000; i++);
-          }
-  }
 
+              for(i=0; i< 20000; i++);
+
+
+//          }
+  } else if (value == 0xAB){
+
+      P2OUT ^= BIT5;
+      for(i=0; i< 20000; i++);
+
+
+  }
+  P1OUT = 0;
+  P2OUT = 0;
 
 
 }
