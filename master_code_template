@@ -1,6 +1,7 @@
 #include <msp430.h>
 
 volatile char received_ch = 0;
+volatile int i = 0;
 int main(void)
 {
 WDTCTL = WDTPW + WDTHOLD; // Stop WDT
@@ -18,12 +19,29 @@ UCA0BR1 = 0; //
 UCA0MCTL = 0; // No modulation
 UCA0CTL1 &= ~UCSWRST; // **Initialize USCI state machine**
 
+
+while(1){
 P1OUT &= (~BIT5); // Select Device
 
 while (!(IFG2 & UCA0TXIFG)); // USCI_A0 TX buffer ready?
-UCA0TXBUF = 0xAA; // Send 0xAA over SPI to Slave
+
+if (i < 50){
+    UCA0TXBUF = 0xAB;
+} else {
+    UCA0TXBUF = 0xAA;
+}
+ // Send 0xAA over SPI to Slave
 while (!(IFG2 & UCA0RXIFG)); // USCI_A0 RX Received?
 received_ch = UCA0RXBUF; // Store received data
 
 P1OUT |= (BIT5); // Unselect Device
+
+__delay_cycles(1000);
+
+
+i = i + 1;
+if (i == 100){
+    i = 0;
+}
+}
 }
