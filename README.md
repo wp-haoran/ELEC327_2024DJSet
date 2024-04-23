@@ -18,19 +18,18 @@ Pitch is controlled by one of the distance sensors, i.e. the farther the distanc
 The following buttons add additional functionality:
 - Single Note Button: sets output sound to single note.
 - Minor Triad Button: sets output sound to minor triad. (if we have time)
-- Major Triad Button: sets output sound to major triad.
+- Major Triad Button: (when held,) sets output sound to major triad.
 The latter two chords are output through multiple piezo buzzers.
 
 ## Volume and Brightness Control
 Volume is controlled by a potentiometer, i.e. the smaller the set resistance, the larger the volume is set in the resulting output sound. This volume is set by pulse-width modulation and dicretized into various levels. The brightness of the LED matrix is scaled with the detected volume.
 
 The following buttons add additional functionality:
-- Mute Button: turns off the output sound.
+- Mute Button: (when held,) turns off the output sound.
 
 ## LED Display Control
-When the device is on, the LED matrix enters the default state where a preset animation plays indefinitely. The volume set by the potentiometer controls the brightness of the LEDs in the LED matrix. 
+When the device is on, the LED matrix enters the default state where an animation based on the music video for _[Bad Apple!!](https://www.youtube.com/watch?v=9lNZ_Rnr7Jc)_ plays indefinitely. The volume set by the potentiometer controls the brightness of the LEDs in the LED matrix. 
 
 The following buttons add additional functionality:
 - Pause Button: pauses the animation.
-- Animation Control Button: enters a state in which the frame of the LED animation can be controlled by adjusting pitch. (?)
-- Switch Animation Button: switches between preset animations. (?)
+- Animation Control Button: (when held,) enters a state in which the frame of the LED animation can be controlled by adjusting pitch. (if we have time)
