@@ -1,8 +1,36 @@
 # ELEC327_2024DJSet
 This repository holds the code for our (Minatel, Huang, Nguyen, Pan) final project at Rice University's ELEC 327 course. 
 
-We sought to construct a DJ set, consisting of a theremin operated with ultrasonic distance sensors and a LED matrix that plays animations determined by the DJ. One ultrasonic distance sensor of the theremin controls pitch, and the other sensor controls volume. The sound is produced by pulse-width modulation and output through piezo buzzers. The buttons control whether the sound output is a single note, a major triad, or a minor triad. The latter two chords are output through multiple piezo buzzers.
+We sought to construct a DJ set, consisting of a theremin operated with ultrasonic distance sensors and a LED matrix that plays animations determined by the DJ. 
 
-For the LED matrix, the default state of the animation is an infinite loop of preset frames. The volume set by the DJ controls the brightness of the LEDs in the LED matrix. The buttons also allow the DJ the ability to pause the animation, control what frame is shown by the LED matrix by adjusting pitch, as well as switch between multiple different preset animations.
+The link to a demonstration of the project is provided [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ).
 
-*EDIT* We will use the ultrasonic distance sensor to control the buzzer pitch and LED matrix. The buzzer volume can be adjusted with a potentiometer. 
+The functionalities of the DJ set are outlined below.
+
+## Block Diagram
+The diagram below illustrates how the components in our system are connected.
+
+(insert image here)
+
+## Pitch Control and Output
+Pitch is controlled by one of the distance sensors, i.e. the farther the distance sensor detects an object, the higher the pitch is set in the resulting output sound. This pitch is set by pulse-width modulation. The output is discretized into notes varying between two octaves, specifically C3 and C5, and played through piezo buzzers.
+
+The following buttons add additional functionality:
+- Single Note Button: sets output sound to single note.
+- Minor Triad Button: sets output sound to minor triad. (if we have time)
+- Major Triad Button: sets output sound to major triad.
+The latter two chords are output through multiple piezo buzzers.
+
+## Volume and Brightness Control
+Volume is controlled by a potentiometer, i.e. the smaller the set resistance, the larger the volume is set in the resulting output sound. This volume is set by pulse-width modulation and dicretized into various levels. The brightness of the LED matrix is scaled with the detected volume.
+
+The following buttons add additional functionality:
+- Mute Button: turns off the output sound.
+
+## LED Display Control
+When the device is on, the LED matrix enters the default state where a preset animation plays indefinitely. The volume set by the potentiometer controls the brightness of the LEDs in the LED matrix. 
+
+The following buttons add additional functionality:
+- Pause Button: pauses the animation.
+- Animation Control Button: enters a state in which the frame of the LED animation can be controlled by adjusting pitch. (?)
+- Switch Animation Button: switches between preset animations. (?)
