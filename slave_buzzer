@@ -6,6 +6,7 @@ int periods[] = {1000000/261.63,
    1000000/329.63,
    1000000/392.00,
    1000000/523.5};
+/*
 extern double notes[][];
 extern double major_triads[][];
 extern double minor_triads[][];
@@ -87,6 +88,7 @@ double major_triads[][] {{130.81      , 165.55640625, 196.215     },
        {440.        , 556.875     , 660.        },
        {466.16      , 589.98375   , 699.24      },
        {493.88      , 625.066875  , 740.82      }};
+*/
 int which_period = 0;
 
 volatile unsigned int i = 0;
