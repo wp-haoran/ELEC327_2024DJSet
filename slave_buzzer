@@ -1,153 +1,3 @@
-////#include <msp430.h>
-////#include "msp430g2553.h"
-////
-////// Notes for a major C chord
-////int periods[] = {1000000/261.63,
-////   1000000/329.63,
-////   1000000/392.00,
-////   1000000/523.5};
-////int empty_periods[] = {0,
-////   0,
-////   0,
-////   0};
-////int current_period[] = &empty_periods;
-////int which_period = 0;
-////
-////volatile unsigned int i = 0;
-////void main(void) {
-////    WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
-////    BCSCTL3 |= LFXT1S_2;      // ACLK = VLO
-////    BCSCTL1 = CALBC1_1MHZ;    // Set the DCO to 1 MHz
-////    DCOCTL = CALDCO_1MHZ;     // And load calibration data
-////    P1DIR = BIT6;
-////    P2DIR |= BIT5; // We need P2.5 to be output
-////    P2DIR |= BIT1; // Set P2.1 as output
-////    P2SEL |= BIT5; // P2.5 is TA1.2 PWM output
-////    TA1CCR0 = periods[which_period];
-////    TA1CCR2 = periods[which_period]>>1; // divde by 2
-////    TA1CCTL2 = OUTMOD_7;
-////    TA1CTL = TASSEL_2 + MC_1; // SMCLK, upmode
-////
-////    WDTCTL = WDT_ADLY_250;  // Set Watchdog Timer to 1000 ms with VLO
-////    IE1 |= WDTIE;
-////    P1OUT |= BIT5;
-////    P1DIR |= BIT5;
-////
-////    P1SEL = BIT1 + BIT2 + BIT4 + BIT5;
-////    P1SEL2 = BIT1 + BIT2 + BIT4 + BIT5;
-////    UCA0CTL1 = UCSWRST;                       // **Put state machine in reset**
-////    UCA0CTL0 |= UCMSB + UCSYNC;               // 3-pin, 8-bit SPI master
-////    UCA0CTL1 &= ~UCSWRST;                     // **Initialize USCI state machine**
-////    IE2 |= UCA0RXIE;
-////
-////
-////
-////    __bis_SR_register(CPUOFF + GIE);
-////
-////
-////    while(1);
-////}
-////
-////#pragma vector=WDT_VECTOR
-////__interrupt void watchdog_timer(void)
-////{
-////  which_period = (which_period + 1) % 4;
-////  TA1CCR2 = periods[which_period]>>1;
-////  TA1CCR0 = periods[which_period];
-////}
-////
-////__attribute__((interrupt(USCIAB0RX_VECTOR))) void USCI0RX_ISR (void)
-////{
-////
-////  char value = UCA0RXBUF;
-////
-////  if (value == 0xAA){
-////      current_period = periods;
-////  }
-////
-////
-////
-////}
-//
-//
-//#include <msp430.h>
-//#include "msp430g2553.h"
-//
-//// Notes for a major C chord
-//int periods[] = {1000000/261.63,
-//   1000000/329.63,
-//   1000000/392.00,
-//   1000000/523.5};
-//int current_periods[] = {0,
-//   0,
-//   0,
-//   0};
-//
-//
-//int which_period = 0;
-//
-//volatile unsigned int i = 0;
-//void main(void) {
-//    WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
-//    BCSCTL3 |= LFXT1S_2;      // ACLK = VLO
-//    BCSCTL1 = CALBC1_1MHZ;    // Set the DCO to 1 MHz
-//    DCOCTL = CALDCO_1MHZ;     // And load calibration data
-//    P1DIR = BIT6;
-//    P2DIR |= BIT5; // We need P2.5 to be output
-//    P2DIR |= BIT1; // Set P2.1 as output
-//    P2SEL |= BIT5; // P2.5 is TA1.2 PWM output
-//    TA1CCR0 = periods[which_period];
-//    TA1CCR2 = periods[which_period]>>1; // divde by 2
-//    TA1CCTL2 = OUTMOD_7;
-//    TA1CTL = TASSEL_2 + MC_1; // SMCLK, upmode
-//
-//    WDTCTL = WDT_ADLY_250;  // Set Watchdog Timer to 1000 ms with VLO
-//    IE1 |= WDTIE;
-//    P1OUT |= BIT5;
-//    P1DIR |= BIT5;
-//
-//    P1SEL = BIT1 + BIT2 + BIT4 + BIT5;
-//    P1SEL2 = BIT1 + BIT2 + BIT4 + BIT5;
-//    UCA0CTL1 = UCSWRST;                       // Put state machine in reset
-//    UCA0CTL0 |= UCMSB + UCSYNC;               // 3-pin, 8-bit SPI master
-//    UCA0CTL1 &= ~UCSWRST;                     // Initialize USCI state machine
-//    IE2 |= UCA0RXIE;
-//
-//
-//
-//    __bis_SR_register(GIE);
-//
-//
-//    while(1);
-//}
-//
-//#pragma vector=WDT_VECTOR
-//__interrupt void watchdog_timer(void)
-//{
-//  which_period = (which_period + 1) % 4;
-//  TA1CCR2 = current_periods[which_period]>>1;
-//  TA1CCR0 = current_periods[which_period];
-//}
-//
-//__attribute ((interrupt(USCIAB0RX_VECTOR))) void USCI0RX_ISR (void)
-//{
-//
-//  char value = UCA0RXBUF;
-//
-//  if (value == 0xAA){
-//      current_periods[0] = periods[0];
-//      current_periods[1] = periods[1];
-//      current_periods[2] = periods[2];
-//      current_periods[3] = periods[3];
-//  }
-//  else if (value == 0xAB){
-//            current_periods[0] = 0;
-//            current_periods[1] = 0;
-//            current_periods[2] = 0;
-//            current_periods[3] = 0;
-//  }
-//}
-
 #include <msp430.h>
 #include "msp430g2553.h"
 
@@ -156,11 +6,92 @@ int periods[] = {1000000/261.63,
    1000000/329.63,
    1000000/392.00,
    1000000/523.5};
+extern double notes[][];
+extern double major_triads[][];
+extern double minor_triads[][];
+
+double notes[][] = {{130.8 },
+       {138.56},
+       {146.8 },
+       {155.6 },
+       {164.8 },
+       {174.64},
+       {185.04},
+       {196.  },
+       {207.68},
+       {220.  },
+       {233.12},
+       {246.96},
+       {261.6 },
+       {277.12},
+       {293.6 },
+       {311.2 },
+       {329.6 },
+       {349.28},
+       {370.08},
+       {392.  },
+       {415.36},
+       {440.  },
+       {466.24},
+       {493.92}};
+
+
+double minor_triads[][] = {{130.8       , 155.02222222, 196.2       },
+       {138.56      , 164.21925926, 207.84      },
+       {146.8       , 173.98518519, 220.2       },
+       {155.6       , 184.41481481, 233.4       },
+       {164.8       , 195.31851852, 247.2       },
+       {174.64      , 206.98074074, 261.96      },
+       {185.04      , 219.30666667, 277.56      },
+       {196.        , 232.2962963 , 294.        },
+       {207.68      , 246.13925926, 311.52      },
+       {220.        , 260.74074074, 330.        },
+       {233.12      , 276.29037037, 349.68      },
+       {246.96      , 292.69333333, 370.44      },
+       {261.6       , 310.04444444, 392.4       },
+       {277.12      , 328.43851852, 415.68      },
+       {293.6       , 347.97037037, 440.4       },
+       {311.2       , 368.82962963, 466.8       },
+       {329.6       , 390.63703704, 494.4       },
+       {349.28      , 413.96148148, 523.92      },
+       {370.08      , 438.61333333, 555.12      },
+       {392.        , 464.59259259, 588.        },
+       {415.36      , 492.27851852, 623.04      },
+       {440.        , 521.48148148, 660.        },
+       {466.24      , 552.58074074, 699.36      },
+       {493.92      , 585.38666667, 740.88      }};
+
+
+
+double major_triads[][] {{130.81      , 165.55640625, 196.215     },
+       {138.59      , 175.40296875, 207.885     },
+       {146.83      , 185.83171875, 220.245     },
+       {155.56      , 196.880625  , 233.34      },
+       {164.81      , 208.58765625, 247.215     },
+       {174.61      , 220.99078125, 261.915     },
+       {185.        , 234.140625  , 277.5       },
+       {196.        , 248.0625    , 294.        },
+       {207.65      , 262.80703125, 311.475     },
+       {220.        , 278.4375    , 330.        },
+       {233.08      , 294.991875  , 349.62      },
+       {246.94      , 312.5334375 , 370.41      },
+       {261.63      , 331.12546875, 392.445     },
+       {277.18      , 350.8059375 , 415.77      },
+       {293.66      , 371.6634375 , 440.49      },
+       {311.13      , 393.77390625, 466.695     },
+       {329.63      , 417.18796875, 494.445     },
+       {349.23      , 441.99421875, 523.845     },
+       {369.99      , 468.26859375, 554.985     },
+       {392.        , 496.125     , 588.        },
+       {415.3       , 525.6140625 , 622.95      },
+       {440.        , 556.875     , 660.        },
+       {466.16      , 589.98375   , 699.24      },
+       {493.88      , 625.066875  , 740.82      }};
 int which_period = 0;
 
 volatile unsigned int i = 0;
 void main(void) {
-    WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
+//    WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
 
     P1DIR = BIT6;
     P2DIR = BIT5;
@@ -187,8 +118,8 @@ void main(void) {
     P2DIR |= BIT1; // Set P2.1 as output
     P2SEL |= BIT5; // P2.5 is TA1.2 PWM output
 
-    TA1CCR0 = periods[which_period];
-    TA1CCR2 = periods[which_period]>>1; // divde by 2
+//    TA1CCR0 = periods[which_period];
+//    TA1CCR2 = periods[which_period]>>1; // divide by 2
     TA1CCTL2 = OUTMOD_7;
     TA1CTL = TASSEL_2 + MC_1; // SMCLK, upmode
 
@@ -202,13 +133,29 @@ __attribute__((interrupt(USCIAB0RX_VECTOR))) void USCI0RX_ISR (void)
 {
   char value = UCA0RXBUF;
   if (value == 0xAA){
-              P1OUT ^= BIT6;
-              for(i=0; i< 20000; i++);
+      P1OUT ^= BIT6;
+//      TA1CCR0 = periods[0];
+//      TA1CCR2 = periods[which_period]>>1; // divide by 2
+      periods[0] = 1000000/261.63;
+      periods[1] = 1000000/261.63;
+      periods[2] = 1000000/261.63;
+      periods[3] = 1000000/261.63;
+      for(i=0; i< 20000; i++);
   } else if (value == 0xAB){
       P2OUT ^= BIT5;
+      periods[0] = 1000000/329.63;
+      periods[1] = 1000000/329.63;
+      periods[2] = 1000000/329.63;
+      periods[3] = 1000000/329.63;
+//      TA1CCR0 = periods[1];
+//      TA1CCR2 = periods[which_period]>>1; // divide by 2
       for(i=0; i< 20000; i++);
-  } else if (value == 0xCC){
-
+  } else if (value == 0xAC){
+      P2OUT ^= BIT3;
+      periods[0] = 1000000/392.00;
+      periods[1] = 1000000/392.00;
+      periods[2] = 1000000/392.00;
+      periods[3] = 1000000/392.00;
   }
   P1OUT = 0;
   P2OUT = 0;
@@ -222,3 +169,63 @@ __interrupt void watchdog_timer(void)
   TA1CCR0 = periods[which_period];
 }
 
+
+
+//#include <msp430.h>
+//
+//
+//volatile unsigned int i = 0;
+//void main(void) {
+//    WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
+//
+//    P1DIR = BIT6;
+//    P2DIR = BIT5 | BIT3 | BIT1;
+//
+//    P1OUT = 0;
+//    P2OUT = 0;
+//
+//    P1OUT |= BIT5;
+//    P1DIR |= BIT5;
+//
+//    P1SEL = BIT1 + BIT2 + BIT4 + BIT5;
+//    P1SEL2 = BIT1 + BIT2 + BIT4 + BIT5;
+//    UCA0CTL1 = UCSWRST;                       // **Put state machine in reset**
+//    UCA0CTL0 |= UCMSB + UCSYNC;               // 3-pin, 8-bit SPI master
+//    UCA0CTL1 &= ~UCSWRST;                     // **Initialize USCI state machine**
+//    IE2 |= UCA0RXIE;
+//
+//
+//
+//    __bis_SR_register(GIE);
+//
+//
+//    while(1);
+//}
+//__attribute__((interrupt(USCIAB0RX_VECTOR))) void USCI0RX_ISR (void)
+//{
+//
+//  char value = UCA0RXBUF;
+//
+//  if (value == 0xAA){
+////      for (;;)
+////          {
+//              P1OUT ^= BIT6;
+//
+//              for(i=0; i< 20000; i++);
+//
+//
+////          }
+//  } else if (value == 0xAB){
+//
+//      P2OUT ^= BIT5;
+//      for(i=0; i< 20000; i++);
+//  } else if (value == 0xAC){
+//      P2OUT ^= BIT3;
+//      for(i=0; i< 20000; i++);
+//  }
+//
+//  P1OUT = 0;
+//  P2OUT = 0;
+//
+//
+//}
