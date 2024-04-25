@@ -6,101 +6,28 @@ int periods[] = {1000000/261.63,
    1000000/329.63,
    1000000/392.00,
    1000000/523.5};
-//extern double notes[][];
-//extern double major_triads[][];
-//extern double minor_triads[][];
-//
-//double notes[][] = {{130.8 },
-//       {138.56}, *
-//       {146.8 },
-//       {155.6 },*
-//       {164.8 },
-//       {174.64},
-//       {185.04},*
-//       {196.  },
-//       {207.68},*
-//       {220.  },
-//       {233.12},*
-//       {246.96},
-//       {261.6 }, C4
-//       {277.12},
-//       {293.6 },
-//       {311.2 },
-//       {329.6 },
-//       {349.28},
-//       {370.08},
-//       {392.  },
-//       {415.36},
-//       {440.  },
-//       {466.24},
-//       {493.92}};
-//
-//
-//double minor_triads[][] = {{130.8       , 155.02222222, 196.2       },
-//       {138.56      , 164.21925926, 207.84      },
-//       {146.8       , 173.98518519, 220.2       },
-//       {155.6       , 184.41481481, 233.4       },
-//       {164.8       , 195.31851852, 247.2       },
-//       {174.64      , 206.98074074, 261.96      },
-//       {185.04      , 219.30666667, 277.56      },
-//       {196.        , 232.2962963 , 294.        },
-//       {207.68      , 246.13925926, 311.52      },
-//       {220.        , 260.74074074, 330.        },
-//       {233.12      , 276.29037037, 349.68      },
-//       {246.96      , 292.69333333, 370.44      },
-//       {261.6       , 310.04444444, 392.4       },
-//       {277.12      , 328.43851852, 415.68      },
-//       {293.6       , 347.97037037, 440.4       },
-//       {311.2       , 368.82962963, 466.8       },
-//       {329.6       , 390.63703704, 494.4       },
-//       {349.28      , 413.96148148, 523.92      },
-//       {370.08      , 438.61333333, 555.12      },
-//       {392.        , 464.59259259, 588.        },
-//       {415.36      , 492.27851852, 623.04      },
-//       {440.        , 521.48148148, 660.        },
-//       {466.24      , 552.58074074, 699.36      },
-//       {493.92      , 585.38666667, 740.88      }};
-//
-//
-//
-//double major_triads[][] {{130.81      , 165.55640625, 196.215     },
-//       {138.59      , 175.40296875, 207.885     },
-//       {146.83      , 185.83171875, 220.245     },
-//       {155.56      , 196.880625  , 233.34      },
-//       {164.81      , 208.58765625, 247.215     },
-//       {174.61      , 220.99078125, 261.915     },
-//       {185.        , 234.140625  , 277.5       },
-//       {196.        , 248.0625    , 294.        },
-//       {207.65      , 262.80703125, 311.475     },
-//       {220.        , 278.4375    , 330.        },
-//       {233.08      , 294.991875  , 349.62      },
-//       {246.94      , 312.5334375 , 370.41      },
-//       {261.63      , 331.12546875, 392.445     },
-//       {277.18      , 350.8059375 , 415.77      },
-//       {293.66      , 371.6634375 , 440.49      },
-//       {311.13      , 393.77390625, 466.695     },
-//       {329.63      , 417.18796875, 494.445     },
-//       {349.23      , 441.99421875, 523.845     },
-//       {369.99      , 468.26859375, 554.985     },
-//       {392.        , 496.125     , 588.        },
-//       {415.3       , 525.6140625 , 622.95      },
-//       {440.        , 556.875     , 660.        },
-//       {466.16      , 589.98375   , 699.24      },
-//       {493.88      , 625.066875  , 740.82      }};
-int which_period = 0;
 
+int which_period = 0;
+int which_octave = 0;
 volatile unsigned int i = 0;
 void main(void) {
 //    WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
 
-    P1DIR = BIT6;
+    // Button and LED ISR setup
+    P1DIR = BIT0 | BIT5 | BIT6; // green LED for interrupt check
+//    P1DIR &= ~BIT3;
+//    P1IE |= BIT3; // interrupt enable
+//    P1IES |= BIT3; // setting edge select
+//    P1IFG &= ~BIT3; // set flag to 0
+
+//    P1DIR = BIT6;
     P2DIR = BIT5;
 
     P1OUT = 0;
     P2OUT = 0;
 
     P1OUT |= BIT5;
-    P1DIR |= BIT5;
+//    P1DIR |= BIT5;
 
     P1SEL = BIT1 + BIT2 + BIT4 + BIT5;
     P1SEL2 = BIT1 + BIT2 + BIT4 + BIT5;
@@ -118,78 +45,140 @@ void main(void) {
     P2DIR |= BIT1; // Set P2.1 as output
     P2SEL |= BIT5; // P2.5 is TA1.2 PWM output
 
-//    TA1CCR0 = periods[which_period];
-//    TA1CCR2 = periods[which_period]>>1; // divide by 2
     TA1CCTL2 = OUTMOD_7;
     TA1CTL = TASSEL_2 + MC_1; // SMCLK, upmode
 
     WDTCTL = WDT_ADLY_16;  // Set Watchdog Timer to 1000 ms with VLO
     IE1 |= WDTIE;
 
+    __enable_interrupt();
+
     __bis_SR_register(CPUOFF + GIE);
-//    while(1);
 }
+
+// On board button ISR to play different octaves
+//# pragma vector=PORT1_VECTOR
+//__interrupt void PORT1_ISR(void)
+//{
+//    // Green LED on every press
+////    P1DIR ^= BIT0;
+////    P1DIR &= ~BIT3;
+//    if (which_octave) {
+//        // which_octave is now 3rd octave
+//        which_octave = 0;
+////        P1IES ^= BIT3;
+////        P1IFG &= ~BIT3;
+//    }
+//    else {
+//        // which_octave is now 4th octave
+//        which_octave = 1;
+////        P1IES ^= BIT3;
+////        P1IFG &= ~BIT3;
+//    }
+//    // default case to use Port 1.3 for interrupt processing
+////    P1IES ^= BIT3;
+//    P1IFG &= ~BIT3;
+//}
+
+
 __attribute__((interrupt(USCIAB0RX_VECTOR))) void USCI0RX_ISR (void)
 {
   char value = UCA0RXBUF;
-  if (value == 0xA1){
-//      P1OUT ^= BIT6;
-//      {{130.8 },
-      //       {138.56}, *
-      //       {146.8 },
-      //       {155.6 },*
-      //       {164.8 },
-      //       {174.64},
-      //       {185.04},*
-      //       {196.  },
-      //       {207.68},*
-      //       {220.  },
-      //       {233.12},*
-      //       {246.96},
+  if ((value == 0xA1) && ~which_octave){
+      // C5
+    periods[0] = 1000000/523.2;
+    periods[1] = 1000000/523.2;
+    periods[2] = 1000000/523.2;
+    periods[3] = 1000000/523.2;
+      for(i=0; i< 20000; i++);
+  } else if ((value == 0xA2) && ~which_octave){
+      // D5
+    periods[0] = 1000000/587.2;
+    periods[1] = 1000000/587.2;
+    periods[2] = 1000000/587.2;
+    periods[3] = 1000000/587.2;
+      for(i=0; i< 20000; i++);
+  } else if ((value == 0xA3) && ~which_octave){
+      // E5
+    periods[0] = 1000000/659.2;
+    periods[1] = 1000000/659.2;
+    periods[2] = 1000000/659.2;
+    periods[3] = 1000000/659.2;
+  } else if ((value == 0xA4) && ~which_octave){
+      // F5
+    periods[0] = 1000000/698.56;
+    periods[1] = 1000000/698.56;
+    periods[2] = 1000000/698.56;
+    periods[3] = 1000000/698.56;
+  } else if ((value == 0xA5) && ~which_octave){
+      // G5
+    periods[0] = 1000000/784;
+    periods[1] = 1000000/784;
+    periods[2] = 1000000/784;
+    periods[3] = 1000000/784;
+  } else if ((value == 0xA6) && ~which_octave){
+      // A5
+    periods[0] = 1000000/880;
+    periods[1] = 1000000/880;
+    periods[2] = 1000000/880;
+    periods[3] = 1000000/880;
+  } else if ((value == 0xA7) && ~which_octave){
+      // B5
+    periods[0] = 1000000/987.84;
+    periods[1] = 1000000/987.84;
+    periods[2] = 1000000/987.84;
+    periods[3] = 1000000/987.84;
+  } else if ((value == 0xA8) && ~which_octave){
+      // None
+    periods[0] = 0;
+    periods[1] = 0;
+    periods[2] = 0;
+    periods[3] = 0;
+  } else if ((value == 0xA1) && which_octave){
       // C4
     periods[0] = 1000000/261.6;
     periods[1] = 1000000/261.6;
     periods[2] = 1000000/261.6;
     periods[3] = 1000000/261.6;
       for(i=0; i< 20000; i++);
-  } else if (value == 0xA2){
+  } else if ((value == 0xA2) && which_octave){
       // D4
     periods[0] = 1000000/293.7;
     periods[1] = 1000000/293.7;
     periods[2] = 1000000/293.7;
     periods[3] = 1000000/293.7;
       for(i=0; i< 20000; i++);
-  } else if (value == 0xA3){
+  } else if ((value == 0xA3) && which_octave){
       // E4
     periods[0] = 1000000/329.6;
     periods[1] = 1000000/329.6;
     periods[2] = 1000000/329.6;
     periods[3] = 1000000/329.6;
-  } else if (value == 0xA4){
+  } else if ((value == 0xA4) && which_octave){
       // F4
     periods[0] = 1000000/349.2;
     periods[1] = 1000000/349.2;
     periods[2] = 1000000/349.2;
     periods[3] = 1000000/349.2;
-  } else if (value == 0xA5){
+  } else if ((value == 0xA5) && which_octave){
       // G4
     periods[0] = 1000000/392.0;
     periods[1] = 1000000/392.0;
     periods[2] = 1000000/392.0;
     periods[3] = 1000000/392.0;
-  } else if (value == 0xA6){
-      // A5
+  } else if ((value == 0xA6) && which_octave){
+      // A4
     periods[0] = 1000000/440.0;
     periods[1] = 1000000/440.0;
     periods[2] = 1000000/440.0;
     periods[3] = 1000000/440.0;
-  } else if (value == 0xA7){
-      // B5
-    periods[0] = 1000000/493.9;
-    periods[1] = 1000000/493.9;
-    periods[2] = 1000000/493.9;
-    periods[3] = 1000000/493.9;
-  } else if (value == 0xA8){
+  } else if ((value == 0xA7) && which_octave){
+      // B4
+    periods[0] = 1000000/493.92;
+    periods[1] = 1000000/493.92;
+    periods[2] = 1000000/493.92;
+    periods[3] = 1000000/493.92;
+  } else if ((value == 0xA8) && which_octave){
       // None
     periods[0] = 0;
     periods[1] = 0;
@@ -206,4 +195,5 @@ __interrupt void watchdog_timer(void)
   which_period = (which_period + 1) % 4;
   TA1CCR2 = periods[which_period]>>1;
   TA1CCR0 = periods[which_period];
+//  P1IES |= BIT3;
 }
