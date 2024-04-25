@@ -84,6 +84,6 @@ void rgb_send_row(const int *row, uint8_t *color, int reversed, bool last_row); 
  * @param color_id An integer 0-6 (inclusive) indicating the color.
  * @return Void.
  */
-void rgb_send_frame(const int *frame, uint8_t *color, int color_id);
+void rgb_send_frame(const int *frame, uint8_t *color, int color_id, uint8_t brightness);
 
 #endif /* RGB_INTERFACE_H_ */
