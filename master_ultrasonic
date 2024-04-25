@@ -83,12 +83,26 @@ void main(void)
 
         while (!(IFG2 & UCA0TXIFG)); // USCI_A0 TX buffer ready?
 
-        if (dst_int < 20){
-            UCA0TXBUF = 0xAB;
-        } else if ((dst_int > 20) && (dst_int < 50)) {
-            UCA0TXBUF = 0xAA;
+        if (dst_int < 15){
+            UCA0TXBUF = 0xA1;
+        } else if ((dst_int > 15) && (dst_int < 30)) {
+            UCA0TXBUF = 0xA2;
+        } else if ((dst_int > 30) && (dst_int < 45)) {
+            UCA0TXBUF = 0xA3;
+        } else if ((dst_int > 45) && (dst_int < 60)) {
+            UCA0TXBUF = 0xA4;
+        } else 
+            
+            
+            
+            if ((dst_int > 60) && (dst_int < 75)) {
+            UCA0TXBUF = 0xA5;
+        } else if ((dst_int > 75) && (dst_int < 90)) {
+            UCA0TXBUF = 0xA6;
+        } else if ((dst_int > 90) && (dst_int < 105)) {
+            UCA0TXBUF = 0xA7;
         } else {
-            UCA0TXBUF = 0xAC;
+            UCA0TXBUF = 0xA8;
         }
          // Send 0xAA over SPI to Slave
         while (!(IFG2 & UCA0RXIFG)); // USCI_A0 RX Received?
