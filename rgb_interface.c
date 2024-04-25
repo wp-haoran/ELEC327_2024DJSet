@@ -17,9 +17,9 @@
 #include "rgb_interface.h"
 
 void rgb_init_spi(void){
-    // COPI on p1.2, SCLK on p1.4
-    P1SEL = BIT2 + BIT4;
-    P1SEL2 = BIT2 + BIT4;
+    // COPI on p1.7, SCLK on p1.4
+    P1SEL = BIT4 + BIT7;
+    P1SEL2 = BIT4 + BIT7;
 
     // Set clock frequency to 16MHz
     BCSCTL1 = CALBC1_16MHZ;
@@ -28,12 +28,12 @@ void rgb_init_spi(void){
     // Set SMCLK = DCO
     BCSCTL2 &= ~SELS;
 
-    UCA0CTL1=UCSWRST; //disable serial interface
-    UCA0CTL0 |= UCCKPH + UCMSB + UCMST + UCSYNC;    // data cap at 1st clk edge, MSB first, master mode, synchronous
-    UCA0CTL1 |= UCSSEL_2;                           // select SMCLK
-    UCA0BR0 = 0;                                    // set frequency
-    UCA0BR1 = 0;                                    //
-    UCA0CTL1 &= ~UCSWRST;           // Initialize USCI state machine
+    UCB0CTL1=UCSWRST; //disable serial interface
+    UCB0CTL0 |= UCCKPH + UCMSB + UCMST + UCSYNC;    // data cap at 1st clk edge, MSB first, master mode, synchronous
+    UCB0CTL1 |= UCSSEL_2;                           // select SMCLK
+    UCB0BR0 = 0;                                    // set frequency
+    UCB0BR1 = 0;                                    //
+    UCB0CTL1 &= ~UCSWRST;           // Initialize USCI state machine
 }
 
 void change_color(uint8_t *color, int color_id, uint8_t brightness){
@@ -84,25 +84,25 @@ void change_color(uint8_t *color, int color_id, uint8_t brightness){
 }
 
 void rgb_send_color(const uint8_t *color, int light_on, bool wait_for_completion){
-    unsigned int byte1;
-    unsigned int bit1;
+    int byte1;
+    int bit1;
     for (byte1 = 0; byte1 < 3; byte1++){ // send 24 "bit" frame in 8 bit chunks
         for (bit1 = 7; bit1 >= 0; bit1--)
         if (light_on && ((color[byte1] >> bit1) & 0x01 == 0x01)) {  // Bit = 1
-            UCA0TXBUF = 0xFF;
-            while (!(IFG2 & UCA0TXIFG));  // USCI_A0 TX buffer ready?
-            UCA0TXBUF = 0xE0;
-            while (!(IFG2 & UCA0TXIFG));
+            UCB0TXBUF = 0xFF;
+            while (!(IFG2 & UCB0TXIFG));  // USCI_B0 TX buffer ready?
+            UCB0TXBUF = 0xE0;
+            while (!(IFG2 & UCB0TXIFG));
         }
         else { // Bit = 0
-            UCA0TXBUF = 0xF0;
-            while (!(IFG2 & UCA0TXIFG));  // USCI_A0 TX buffer ready?
-            UCA0TXBUF = 0x00;
-            while (!(IFG2 & UCA0TXIFG));
+            UCB0TXBUF = 0xF0;
+            while (!(IFG2 & UCB0TXIFG));  // USCI_B0 TX buffer ready?
+            UCB0TXBUF = 0x00;
+            while (!(IFG2 & UCB0TXIFG));
         }
     }
     if (wait_for_completion)
-        while (!(IFG2 & UCA0RXIFG));  // USCI_A0 RX buffer ready? (indicates transfer complete)
+        while (!(IFG2 & UCB0RXIFG));  // USCI_B0 RX buffer ready? (indicates transfer complete)
 }
 
 void rgb_send_row(const int *row, uint8_t *color, int reversed, bool last_row){
@@ -129,6 +129,6 @@ void rgb_send_frame(const int *frame, uint8_t *color, int color_id, uint8_t brig
         reversed = (i & 1 == 1); // reverses odd rows
         rgb_send_row(frame[i], color, reversed, false);
     }
-    rgb_send_row(frame[15], color, 0, false);
+    rgb_send_row(frame[15], color, 0, true);
 }
 
