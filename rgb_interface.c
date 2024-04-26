@@ -76,59 +76,52 @@ void change_color(uint8_t *color, int color_id, uint8_t brightness){
         color[0] = brightness;
         color[1] = brightness;
         color[2] = brightness;
-    default : ; // color = off
-        color[0] = 0x00;
-        color[1] = 0x00;
-        color[2] = 0x00;
     }
 }
 
-void rgb_send_color(const uint8_t *color, int light_on, bool wait_for_completion){
-    int byte1;
+void rgb_send_color(const uint8_t *color, char light_on, bool wait_for_completion){
+    char byte1;
     int bit1;
-    for (byte1 = 0; byte1 < 3; byte1++){ // send 24 "bit" frame in 8 bit chunks
-        for (bit1 = 7; bit1 >= 0; bit1--)
-        if (light_on && ((color[byte1] >> bit1) & 0x01 == 0x01)) {  // Bit = 1
-            UCB0TXBUF = 0xFF;
-            while (!(IFG2 & UCB0TXIFG));  // USCI_B0 TX buffer ready?
-            UCB0TXBUF = 0xE0;
-            while (!(IFG2 & UCB0TXIFG));
-        }
-        else { // Bit = 0
-            UCB0TXBUF = 0xF0;
-            while (!(IFG2 & UCB0TXIFG));  // USCI_B0 TX buffer ready?
-            UCB0TXBUF = 0x00;
-            while (!(IFG2 & UCB0TXIFG));
+    for (byte1 = 0; byte1 < 3; byte1++) { // send 24 "bit" frame in 8 bit chunks
+        for (bit1 = 7; bit1 >= 0; bit1--) {
+            if (light_on & (color[byte1] >> bit1) == 1) {  // Bit = 1
+                UCB0TXBUF = 0x1F;
+                while (!(IFG2 & UCB0TXIFG));  // USCI_B0 TX buffer ready?
+                UCB0TXBUF = 0x00;
+                while (!(IFG2 & UCB0TXIFG));  // USCI_B0 TX buffer ready?
+            }
+            else { // Bit = 0
+                UCB0TXBUF = 0x7E;
+                while (!(IFG2 & UCB0TXIFG));  // USCI_B0 TX buffer ready?
+                UCB0TXBUF = 0x00;
+                while (!(IFG2 & UCB0TXIFG));  // USCI_B0 TX buffer ready?
+            }
         }
     }
     if (wait_for_completion)
         while (!(IFG2 & UCB0RXIFG));  // USCI_B0 RX buffer ready? (indicates transfer complete)
 }
 
-void rgb_send_row(const int *row, uint8_t *color, int reversed, bool last_row){
-    unsigned int i;
+void rgb_send_row(const char *row, uint8_t *color, bool reversed, bool last_row){
+    int i;
     if (reversed) {
-        for (i = 15; i > 0; i--) {
-            rgb_send_color(color, row[i], false);
-        }
-        rgb_send_color(color, row[0], last_row);
+        for (i = 0; i < 8; i++) { rgb_send_color(color, (row[1] >> i) & 0x01, false); }
+        for (i = 0; i < 7; i++) { rgb_send_color(color, (row[0] >> i) & 0x01, false); }
+        rgb_send_color(color, ((row[0] >> 7) & 0x01) == 0x01, last_row);
     }
     else {
-        for (i = 0; i < 15; i++) {
-            rgb_send_color(color, row[i], false);
-        }
-        rgb_send_color(color, row[15], last_row);
+        for (i = 7; i >= 0; i--) { rgb_send_color(color, (row[0] >> i) & 0x01, false); }
+        for (i = 7; i > 0; i--) { rgb_send_color(color, (row[1] >> i) & 0x01, false); }
+        rgb_send_color(color, row[1] & 0x01, last_row);
     }
 }
 
-void rgb_send_frame(const int *frame, uint8_t *color, int color_id, uint8_t brightness){
-    unsigned int i;
-    int reversed;
+void rgb_send_frame(const char (*frame)[2], uint8_t *color, int color_id, uint8_t brightness){
+    int i;
     change_color(color, color_id, brightness);
     for (i = 0; i < 15; i++) {
-        reversed = (i & 1 == 1); // reverses odd rows
-        rgb_send_row(frame[i], color, reversed, false);
+        rgb_send_row(frame[i], color, !(i & 1), false); // reverses even rows
     }
-    rgb_send_row(frame[15], color, 0, true);
+    rgb_send_row(frame[15], color, false, true);
 }
 
