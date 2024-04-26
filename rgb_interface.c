@@ -36,7 +36,7 @@ void rgb_init_spi(void){
     UCB0CTL1 &= ~UCSWRST;           // Initialize USCI state machine
 }
 
-void change_color(uint8_t *color, int color_id, uint8_t brightness){
+static void change_color(uint8_t *color, int color_id, uint8_t brightness){
     if(brightness > 0x40) { // prevents overly high brightness
         brightness = 0x40;
     }
@@ -79,7 +79,7 @@ void change_color(uint8_t *color, int color_id, uint8_t brightness){
     }
 }
 
-void rgb_send_color(const uint8_t *color, char light_on, bool wait_for_completion){
+static void rgb_send_color(const uint8_t *color, char light_on, bool wait_for_completion){
     char byte1;
     int bit1;
     for (byte1 = 0; byte1 < 3; byte1++) { // send 24 "bit" frame in 8 bit chunks
@@ -102,7 +102,7 @@ void rgb_send_color(const uint8_t *color, char light_on, bool wait_for_completio
         while (!(IFG2 & UCB0RXIFG));  // USCI_B0 RX buffer ready? (indicates transfer complete)
 }
 
-void rgb_send_row(const char *row, uint8_t *color, bool reversed, bool last_row){
+static void rgb_send_row(const char *row, uint8_t *color, bool reversed, bool last_row){
     int i;
     if (reversed) {
         for (i = 0; i < 8; i++) { rgb_send_color(color, (row[1] >> i) & 0x01, false); }
