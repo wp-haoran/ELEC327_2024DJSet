@@ -4,49 +4,46 @@
 #include <string.h>
 #include <math.h>
 
+// code remains from serial debugging for testing
 char printdist[] = "Distance to the nearest object is: ";
 char centimeter[] = " cm";
 char dot[] = ".";
 char zerro[] = "0";
 char newline[] = " \r\n";
+char dst_char[5];
+char dst_flt_char[5];
+void ser_output(char *str);
+
+// variables to track iterations and distance
 volatile int temp[2];
 volatile float diff;
 volatile unsigned int i=0;
 int dst_int;
 int dst_flt;
 float tmp_flt;
-char dst_char[5];
-char dst_flt_char[5];
 volatile float distance;
-void ser_output(char *str);
 
+// flag to make sure transmitted message is received by slave
 volatile char received_ch = 0;
 
 void main(void)
 
 {
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
-    BCSCTL1= CALBC1_1MHZ;
+    BCSCTL1= CALBC1_1MHZ; // use 1 Mhz clock
     DCOCTL = CALDCO_1MHZ;
 
-
-
-    //pins spi
+    //pins for spi communication -- based on which GPIO pins are connected to other hardware
     P1OUT |= BIT5;
     P1DIR |= BIT5 | BIT6;
     P1SEL = BIT1 | BIT2 | BIT4 | BIT6;
     P1SEL2 = BIT1 | BIT2 | BIT4;
 
 
-    //pins ultrasonic//
-       //P1DIR = BIT6;
-        P2SEL = BIT1;
-        //P1SEL = BIT1|BIT2|BIT6;
-        //P1SEL2 = BIT1|BIT2;
-        //
+    //pin selection for ultrasonic sensor
+    P2SEL = BIT1;
 
-
-    //spi
+    //spi setup TX to send to slave
     UCA0CTL1 = UCSWRST;
     UCA0CTL0 |= UCCKPH + UCMSB + UCMST + UCSYNC; // 3-pin, 8-bit SPI master
     UCA0CTL1 |= UCSSEL_2; // SMCLK
@@ -54,24 +51,14 @@ void main(void)
     UCA0BR1 = 0; //
     UCA0MCTL = 0; // No modulation
     UCA0CTL1 &= ~UCSWRST; // **Initialize USCI state machine**
-    //
 
-    //uart
-//    UCA0CTL1 |= UCSWRST+UCSSEL_2;
-//    UCA0BR0 = 52;
-//    UCA0BR1 = 0;
-//    UCA0MCTL = UCBRS_0;
-//    UCA0CTL1 &= ~UCSWRST;
-    //
-
-    //ultrasonic
+    //ultrasonic sensor setup -- setting up timers
     TA0CTL = TASSEL_2|MC_1 ;
     TA0CCR0 = 0xFFFF;
     TA0CCR1 = 0x000A;
     TA0CCTL1 = OUTMOD_7;
     TA1CTL = TASSEL_2|MC_2 ;
     TA1CCTL1 = CAP | CCIE | CCIS_0 | CM_3 | SCS ;
-    //
 
     _enable_interrupts();
 
