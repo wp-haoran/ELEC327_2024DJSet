@@ -8,17 +8,17 @@ int periods[] = {1000000/261.63,
    1000000/523.5};
 
 int which_period = 0;
-//int which_octave = 0;
+int which_octave = 0;
 volatile unsigned int i = 0;
 void main(void) {
 //    WDTCTL = WDTPW | WDTHOLD;   // Stop watchdog timer
 
     // Button and LED ISR setup
     P1DIR = BIT0 | BIT5 | BIT6; // green LED for interrupt check
-//    P1DIR &= ~BIT3;
-//    P1IE |= BIT3; // interrupt enable
-//    P1IES |= BIT3; // setting edge select
-//    P1IFG &= ~BIT3; // set flag to 0
+    P1DIR &= ~BIT3;
+    P1IE |= BIT3; // interrupt enable
+    P1IES |= BIT3; // setting edge select
+    P1IFG &= ~BIT3; // set flag to 0
 
 //    P1DIR = BIT6;
     P2DIR = BIT5;
@@ -57,12 +57,13 @@ void main(void) {
 }
 
 // On board button ISR to play different octaves
-//# pragma vector=PORT1_VECTOR
-//__interrupt void PORT1_ISR(void)
-//{
-//    // Green LED on every press
-////    P1DIR ^= BIT0;
-////    P1DIR &= ~BIT3;
+# pragma vector=PORT1_VECTOR
+__interrupt void PORT1_ISR(void)
+{
+    // Green LED on every press
+//    P1DIR ^= BIT0;
+//    P1DIR &= ~BIT3;
+
 //    if (which_octave) {
 //        // which_octave is now 3rd octave
 //        which_octave = 0;
@@ -75,110 +76,122 @@ void main(void) {
 ////        P1IES ^= BIT3;
 ////        P1IFG &= ~BIT3;
 //    }
-//    // default case to use Port 1.3 for interrupt processing
-////    P1IES ^= BIT3;
-//    P1IFG &= ~BIT3;
-//}
+
+//    if ((P1OUT & BIT3) != BIT3)
+        which_octave = 1-which_octave;
+//    else
+//        which_octave = 0;
+//        periods[0] = 1000000/220;
+//        periods[1] = 0;
+//        periods[2] = 0;
+//        periods[3] = 0;
+
+    // default case to use Port 1.3 for interrupt processing
+//    P1IES ^= BIT3;
+    P1IFG &= ~BIT3;
+    __bic_SR_register_on_exit(P1IFG);
+
+}
 
 
 __attribute__((interrupt(USCIAB0RX_VECTOR))) void USCI0RX_ISR (void)
 {
   char value = UCA0RXBUF;
-  if (value == 0xA1){
+  if ((value == 0xA1) && ~which_octave){
       // C5
     periods[0] = 1000000/523.2;
     periods[1] = 1000000/523.2;
     periods[2] = 1000000/523.2;
     periods[3] = 1000000/523.2;
-      for(i=0; i< 20000; i++);
-  } else if (value == 0xA2){
+//      for(i=0; i< 20000; i++);
+  } else if ((value == 0xA2) && ~which_octave){
       // D5
     periods[0] = 1000000/587.2;
     periods[1] = 1000000/587.2;
     periods[2] = 1000000/587.2;
     periods[3] = 1000000/587.2;
-      for(i=0; i< 20000; i++);
-  } else if (value == 0xA3) {
+//      for(i=0; i< 20000; i++);
+  } else if ((value == 0xA3) && ~which_octave){
       // E5
     periods[0] = 1000000/659.2;
     periods[1] = 1000000/659.2;
     periods[2] = 1000000/659.2;
     periods[3] = 1000000/659.2;
-  } else if (value == 0xA4){
+  } else if ((value == 0xA4) && ~which_octave){
       // F5
     periods[0] = 1000000/698.56;
     periods[1] = 1000000/698.56;
     periods[2] = 1000000/698.56;
     periods[3] = 1000000/698.56;
-  } else if (value == 0xA5) {
+  } else if ((value == 0xA5) && ~which_octave){
       // G5
     periods[0] = 1000000/784;
     periods[1] = 1000000/784;
     periods[2] = 1000000/784;
     periods[3] = 1000000/784;
-  } else if (value == 0xA6) {
+  } else if ((value == 0xA6) && ~which_octave){
       // A5
     periods[0] = 1000000/880;
     periods[1] = 1000000/880;
     periods[2] = 1000000/880;
     periods[3] = 1000000/880;
-  } else if (value == 0xA7) {
+  } else if ((value == 0xA7) && ~which_octave){
       // B5
     periods[0] = 1000000/987.84;
     periods[1] = 1000000/987.84;
     periods[2] = 1000000/987.84;
     periods[3] = 1000000/987.84;
-  } else if (value == 0xA8) {
+  } else if ((value == 0xA8) && ~which_octave){
       // None
     periods[0] = 0;
     periods[1] = 0;
     periods[2] = 0;
     periods[3] = 0;
-  } else if (value == 0xB1) {
+  } else if ((value == 0xA1) && which_octave){
       // C4
     periods[0] = 1000000/261.6;
     periods[1] = 1000000/261.6;
     periods[2] = 1000000/261.6;
     periods[3] = 1000000/261.6;
-      for(i=0; i< 20000; i++);
-  } else if (value == 0xB2){
+//      for(i=0; i< 20000; i++);
+  } else if ((value == 0xA2) && which_octave){
       // D4
     periods[0] = 1000000/293.7;
     periods[1] = 1000000/293.7;
     periods[2] = 1000000/293.7;
     periods[3] = 1000000/293.7;
-      for(i=0; i< 20000; i++);
-  } else if (value == 0xB3) {
+//      for(i=0; i< 20000; i++);
+  } else if ((value == 0xA3) && which_octave){
       // E4
     periods[0] = 1000000/329.6;
     periods[1] = 1000000/329.6;
     periods[2] = 1000000/329.6;
     periods[3] = 1000000/329.6;
-  } else if (value == 0xB4){
+  } else if ((value == 0xA4) && which_octave){
       // F4
     periods[0] = 1000000/349.2;
     periods[1] = 1000000/349.2;
     periods[2] = 1000000/349.2;
     periods[3] = 1000000/349.2;
-  } else if (value == 0xB5){
+  } else if ((value == 0xA5) && which_octave){
       // G4
     periods[0] = 1000000/392.0;
     periods[1] = 1000000/392.0;
     periods[2] = 1000000/392.0;
     periods[3] = 1000000/392.0;
-  } else if (value == 0xB6) {
+  } else if ((value == 0xA6) && which_octave){
       // A4
     periods[0] = 1000000/440.0;
     periods[1] = 1000000/440.0;
     periods[2] = 1000000/440.0;
     periods[3] = 1000000/440.0;
-  } else if (value == 0xB7) {
+  } else if ((value == 0xA7) && which_octave){
       // B4
     periods[0] = 1000000/493.92;
     periods[1] = 1000000/493.92;
     periods[2] = 1000000/493.92;
     periods[3] = 1000000/493.92;
-  } else if (value == 0xB8){
+  } else if ((value == 0xA8) && which_octave){
       // None
     periods[0] = 0;
     periods[1] = 0;
@@ -187,6 +200,7 @@ __attribute__((interrupt(USCIAB0RX_VECTOR))) void USCI0RX_ISR (void)
   }
   P1OUT = 0;
   P2OUT = 0;
+
 }
 
 #pragma vector=WDT_VECTOR
@@ -195,5 +209,7 @@ __interrupt void watchdog_timer(void)
   which_period = (which_period + 1) % 4;
   TA1CCR2 = periods[which_period]>>1;
   TA1CCR0 = periods[which_period];
+  periods[0] = periods[0]*which_octave;
 //  P1IES |= BIT3;
+//  __bic_SR_register_on_exit(CPUOFF+GIE);
 }
