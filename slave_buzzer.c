@@ -201,6 +201,13 @@ __attribute__((interrupt(USCIAB0RX_VECTOR))) void USCI0RX_ISR (void)
   P1OUT = 0;
   P2OUT = 0;
 
+  if (which_octave){
+      periods[0] *= 2;
+      periods[1] *= 2;
+      periods[2] *= 2;
+      periods[3] *= 2;
+  }
+
 }
 
 #pragma vector=WDT_VECTOR
@@ -209,6 +216,8 @@ __interrupt void watchdog_timer(void)
   which_period = (which_period + 1) % 4;
   TA1CCR2 = periods[which_period]>>1;
   TA1CCR0 = periods[which_period];
+//  periods[0] = 1000000/(1/periods[0]*1000000*(1-0.02847*which_octave));
+//  periods[3] = 1000000/(1/periods[3]*1000000*(1-0.02847*which_octave));
   periods[0] = periods[0]*which_octave;
 //  P1IES |= BIT3;
 //  __bic_SR_register_on_exit(CPUOFF+GIE);
