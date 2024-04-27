@@ -30,6 +30,22 @@
  */
 void rgb_init_spi(void);
 
+static void rgb_generate_color(int seed, uint8_t *color, int brightness);
+
+void rgb_generate_frame(uint8_t *color, int brightness);
+
+/**
+ * @brief Sends color to serial buffer for sending to each LED.
+ *
+ * Writes each bit of the color value as a square wave with an appropriate duty
+ * cycle corresponding to how the WS2812B interprets the bit.
+ *
+ * @param color An array of uint8_t values in GRB format specifying color.
+ * @param wait_for_completion Boolean indicating whether color is last to be sent.
+ * @return Void.
+ */
+static void rgb_send_color(const uint8_t *color, bool wait_for_completion);
+
 /**
  * @brief Sets the color to be passed into the LED matrix.
  *
@@ -43,20 +59,7 @@ void rgb_init_spi(void);
  * @param brightness Brightness value of the color
  * @return Void.
  */
-static void change_color(uint8_t *color, int color_id, uint8_t brightness);
-
-/**
- * @brief Sends color to serial buffer for sending to each LED.
- *
- * Writes each bit of the color value as a square wave with an appropriate duty
- * cycle corresponding to how the WS2812B interprets the bit.
- *
- * @param color An array of uint8_t values in GRB format specifying color.
- * @param light_on Integer dictating whether LED should be on.
- * @param wait_for_completion Boolean indicating whether color is last to be sent.
- * @return Void.
- */
-static void rgb_send_color(const uint8_t *color, char light_on, bool wait_for_completion);
+// static void change_color(uint8_t *color, int color_id, uint8_t brightness);
 
 /**
  * @brief Processes row of binary values to be displayed on LED matrix.
@@ -69,7 +72,7 @@ static void rgb_send_color(const uint8_t *color, char light_on, bool wait_for_co
  * @param last_row Boolean indicating whether row is last of LED matrix.
  * @return Void.
  */
-static void rgb_send_row(const char *row, uint8_t *color, bool reversed, bool last_row);
+// static void rgb_send_row(const char *row, uint8_t *color, bool reversed, bool last_row);
 
 /**
  * @brief Processes frame of binary values to be displayed on LED matrix.
@@ -84,6 +87,6 @@ static void rgb_send_row(const char *row, uint8_t *color, bool reversed, bool la
  * @param color_id An integer 0-6 (inclusive) indicating the color.
  * @return Void.
  */
-void rgb_send_frame(const char (*frame)[2], uint8_t *color, int color_id, uint8_t brightness);
+// void rgb_send_frame(const char (*frame)[2], uint8_t *color, int color_id, uint8_t brightness);
 
 #endif /* RGB_INTERFACE_H_ */
