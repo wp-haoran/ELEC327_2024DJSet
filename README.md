@@ -29,3 +29,7 @@ The LED Matrix plays a pattern of our choosing and changes brightness in respons
 ## Trials And Tribulations
 - We wanted to play the Bad Apple video on the LED matrix, but the MSP430 has limited storage, so we had to figure out a way to store data on the laptop and pass it through to the MSP. We decided on a UART to USB cable, but our cable was not compatible hardware-wise with the RX function of the MSP, resulting in successful transmission but inability for the MSP to relay the information further. As a result, we decided to generate our own frames instead of relying on stored video frames.
 - At one point we postulated that button interrupts would cause difficulties when operating concurrently with watchdog timer and a large amount of serial info being sent across the MSPs, so we experimented with moving the button functionality to the master, where the strain on the WDT was not as heavy. However, this turned out to be a non-issue and so our button functionality remained in the slave code.
+- 
+## Datasheets for components
+WS2812B 50mm x 50mm LEDs https://cdn-shop.adafruit.com/datasheets/WS2812B.pdf
+FT232RL USB-UART Converter IC https://ftdichip.com/wp-content/uploads/2020/08/DS_FT232R.pdf
