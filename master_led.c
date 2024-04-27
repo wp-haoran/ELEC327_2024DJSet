@@ -96,6 +96,18 @@ void main(void)
         }
 
 
+        // ultrasonic distance code for LED brightness
+        if (dst_int < 35){ // if the distance is in the bottom 1/3 of the range, turn on only pin 2.3
+            P2OUT |= BIT3;
+            P2OUT &= ~BIT4;
+        }
+        else if (dst_int < 70){ // middle 1/3 of range, we turn on neither
+            P2OUT &= ~BIT3;
+            P2OUT &= ~BIT4;
+        }else{ // furthest 1/3 of range, turn on only pin 2.4
+            P2OUT &= ~BIT3;
+            P2OUT |= BIT4;
+        }
 
          // Send 0xAA over SPI to Slave
         while (!(IFG2 & UCA0RXIFG)); // USCI_A0 RX Received?
