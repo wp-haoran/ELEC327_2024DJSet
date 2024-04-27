@@ -74,6 +74,7 @@ void main(void)
 
         while (!(IFG2 & UCA0TXIFG)); // USCI_A0 TX buffer ready?
 
+        //sends the correspondednt byte based on the distance recorded
         if (dst_int < 15){
             UCA0TXBUF = 0xA1;
         } else if ((dst_int > 15) && (dst_int < 30)) {
@@ -82,11 +83,7 @@ void main(void)
             UCA0TXBUF = 0xA3;
         } else if ((dst_int > 45) && (dst_int < 60)) {
             UCA0TXBUF = 0xA4;
-        } else
-
-
-
-            if ((dst_int > 60) && (dst_int < 75)) {
+        } else if ((dst_int > 60) && (dst_int < 75)) {
             UCA0TXBUF = 0xA5;
         } else if ((dst_int > 75) && (dst_int < 90)) {
             UCA0TXBUF = 0xA6;
@@ -98,7 +95,7 @@ void main(void)
 
 
 
-         // Send 0xAA over SPI to Slave
+        //message is echoes back by the slave 
         while (!(IFG2 & UCA0RXIFG)); // USCI_A0 RX Received?
         received_ch = UCA0RXBUF; // Store received data
 
