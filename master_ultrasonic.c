@@ -67,7 +67,7 @@ void main(void)
     _enable_interrupts();
 
     while(1){
-        distance = diff/58;
+        distance = diff/58; //calibration neccary (from detasheet)
         dst_int = floor(distance);
 
         P1OUT &= (~BIT5); // Select Device
