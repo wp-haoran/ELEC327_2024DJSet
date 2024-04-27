@@ -23,7 +23,7 @@ Volume is controlled by a potentiometer, i.e. the smaller the set resistance, th
 The following buttons add additional functionality:
 - Mute Button: on press, turns off the output sound.
 
-- File used for brightness control: slave_led_matrix.c
+- File used for brightness control: master_led_matrix.c
 
 ## LED Display Control
 The LED Matrix plays a pattern of our choosing and changes brightness in reponse to the distance closent to the ultrasonic sensor hooked to the respective Master MSP430. We coded 4 levels of brightness. 
