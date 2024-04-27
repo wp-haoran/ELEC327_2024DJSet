@@ -29,6 +29,7 @@ volatile char received_ch = 0;
 void main(void)
 
 {
+    //clock configurations
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
     BCSCTL1= CALBC1_1MHZ; // use 1 Mhz clock
     DCOCTL = CALDCO_1MHZ;
@@ -46,7 +47,7 @@ void main(void)
     P2SEL |= BIT3 | BIT4;
     P2DIR |= BIT3 | BIT4;
 
-    //spi setup TX to send to slave
+    //spi setup
     UCA0CTL1 = UCSWRST;
     UCA0CTL0 |= UCCKPH + UCMSB + UCMST + UCSYNC; // 3-pin, 8-bit SPI master
     UCA0CTL1 |= UCSSEL_2; // SMCLK
@@ -105,13 +106,13 @@ void main(void)
 
 
 
-        __delay_cycles(100000);  //0.5 second delay between sends, this gives time for the buzzer to play the note
+        __delay_cycles(100000);  //0.5 second delay between sends, this gives time for message to be processed by the slave (give time for the buzzer to play the note)
 
 
     }
 }
 
-//timer A1 for SPI send scheduling
+//timer A1 interrupt for distance detection using the ultrasonic sensor
 #pragma vector = TIMER1_A1_VECTOR
 __interrupt void Timer_A(void){
         temp[i] = TA1CCR1;
