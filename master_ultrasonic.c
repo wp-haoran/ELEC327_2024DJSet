@@ -29,7 +29,6 @@ volatile char received_ch = 0;
 void main(void)
 
 {
-    //clock configurations
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
     BCSCTL1= CALBC1_1MHZ; // use 1 Mhz clock
     DCOCTL = CALDCO_1MHZ;
@@ -47,7 +46,7 @@ void main(void)
     P2SEL |= BIT3 | BIT4;
     P2DIR |= BIT3 | BIT4;
 
-    //spi setup
+    //spi setup TX to send to slave
     UCA0CTL1 = UCSWRST;
     UCA0CTL0 |= UCCKPH + UCMSB + UCMST + UCSYNC; // 3-pin, 8-bit SPI master
     UCA0CTL1 |= UCSSEL_2; // SMCLK
@@ -67,14 +66,13 @@ void main(void)
     _enable_interrupts();
 
     while(1){
-        distance = diff/58; //calibration neccary (from detasheet)
+        distance = diff/58;
         dst_int = floor(distance);
 
         P1OUT &= (~BIT5); // Select Device
 
         while (!(IFG2 & UCA0TXIFG)); // USCI_A0 TX buffer ready?
 
-        //sends the correspondednt byte based on the distance recorded
         if (dst_int < 15){
             UCA0TXBUF = 0xA1;
         } else if ((dst_int > 15) && (dst_int < 30)) {
@@ -83,7 +81,11 @@ void main(void)
             UCA0TXBUF = 0xA3;
         } else if ((dst_int > 45) && (dst_int < 60)) {
             UCA0TXBUF = 0xA4;
-        } else if ((dst_int > 60) && (dst_int < 75)) {
+        } else
+
+
+
+            if ((dst_int > 60) && (dst_int < 75)) {
             UCA0TXBUF = 0xA5;
         } else if ((dst_int > 75) && (dst_int < 90)) {
             UCA0TXBUF = 0xA6;
@@ -95,7 +97,7 @@ void main(void)
 
 
 
-        //message is echoes back by the slave 
+         // Send 0xAA over SPI to Slave
         while (!(IFG2 & UCA0RXIFG)); // USCI_A0 RX Received?
         received_ch = UCA0RXBUF; // Store received data
 
@@ -103,13 +105,13 @@ void main(void)
 
 
 
-        __delay_cycles(100000);  //0.5 second delay between sends, this gives time for message to be processed by the slave (give time for the buzzer to play the note)
+        __delay_cycles(100000);  //0.5 second delay between sends, this gives time for the buzzer to play the note
 
 
     }
 }
 
-//timer A1 interrupt for distance detection using the ultrasonic sensor
+//timer A1 for SPI send scheduling
 #pragma vector = TIMER1_A1_VECTOR
 __interrupt void Timer_A(void){
         temp[i] = TA1CCR1;
