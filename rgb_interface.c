@@ -21,21 +21,74 @@ void rgb_init_spi(void){
     P1SEL = BIT4 + BIT7;
     P1SEL2 = BIT4 + BIT7;
 
-    // Set clock frequency to 16MHz
-    BCSCTL1 = CALBC1_16MHZ;
-    DCOCTL = CALDCO_16MHZ;
+    // Set clock frequency to 8MHz
+    BCSCTL1 = CALBC1_8MHZ;
+    DCOCTL = CALDCO_8MHZ;
 
     // Set SMCLK = DCO
     BCSCTL2 &= ~SELS;
 
-    UCB0CTL1=UCSWRST; //disable serial interface
+    // Set TimerA0 = SMCLK, continuous mode, divide by 8 (1500 Hz)
+    TA0CTL = TASSEL_2 + MC_2;
+
+    UCB0CTL1 |= UCSWRST; //disable serial interface
     UCB0CTL0 |= UCCKPH + UCMSB + UCMST + UCSYNC;    // data cap at 1st clk edge, MSB first, master mode, synchronous
     UCB0CTL1 |= UCSSEL_2;                           // select SMCLK
     UCB0BR0 = 0;                                    // set frequency
-    UCB0BR1 = 0;                                    //
+    UCB0BR1 = 0;
     UCB0CTL1 &= ~UCSWRST;           // Initialize USCI state machine
 }
 
+static void rgb_generate_color(int seed, uint8_t *color, int brightness) {
+    switch(brightness) {
+    case 3 : ; // low brightness
+        color[0] = seed & 0x07;
+        color[1] = (seed >> 3) & 0x07;
+        color[2] = (seed >> 6) & 0x07;
+        break;
+    case 5 : ; // high brightness
+        color[0] = seed & 0x1F;
+        color[1] = (seed >> 5) & 0x1F;
+        color[2] = (seed >> 10) & 0x1F;
+        break;
+    default : ; // medium brightness
+        color[0] = seed & 0x0F;
+        color[1] = (seed >> 4) & 0x0F;
+        color[2] = (seed >> 8) & 0x0F;
+    }
+}
+
+static void rgb_send_color(const uint8_t *color, bool wait_for_completion){
+    char byte1;
+    int bit1;
+    for (byte1 = 0; byte1 < 3; byte1++) { // send 24 "bit" frame in 8 bit chunks
+        for (bit1 = 7; bit1 >= 0; bit1--) {
+            if (((color[byte1] >> bit1) & 0x01) == 0x01) {  // Bit = 1
+                UCB0TXBUF = 0xFC;
+                while (!(IFG2 & UCB0TXIFG));  // USCI_B0 TX buffer ready?
+            }
+            else { // Bit = 0
+                UCB0TXBUF = 0xE0;
+                while (!(IFG2 & UCB0TXIFG));  // USCI_B0 TX buffer ready?
+            }
+        }
+    }
+    if (wait_for_completion)
+        while (!(IFG2 & UCB0RXIFG));  // USCI_B0 RX buffer ready? (indicates transfer complete)
+}
+
+void rgb_generate_frame(uint8_t *color, int brightness) {
+    int i;
+    for (i = 255; i > 0; i--) {
+        rgb_generate_color(TA0R, color, brightness);
+        rgb_send_color(color, false);
+    }
+    rgb_generate_color(TA0R, color, brightness);
+    rgb_send_color(color, true);
+}
+
+/*** Code Developed for "Bad Apple Extension" ***/
+/*
 static void change_color(uint8_t *color, int color_id, uint8_t brightness){
     if(brightness > 0x40) { // prevents overly high brightness
         brightness = 0x40;
@@ -79,29 +132,6 @@ static void change_color(uint8_t *color, int color_id, uint8_t brightness){
     }
 }
 
-static void rgb_send_color(const uint8_t *color, char light_on, bool wait_for_completion){
-    char byte1;
-    int bit1;
-    for (byte1 = 0; byte1 < 3; byte1++) { // send 24 "bit" frame in 8 bit chunks
-        for (bit1 = 7; bit1 >= 0; bit1--) {
-            if (light_on & (color[byte1] >> bit1) == 1) {  // Bit = 1
-                UCB0TXBUF = 0x1F;
-                while (!(IFG2 & UCB0TXIFG));  // USCI_B0 TX buffer ready?
-                UCB0TXBUF = 0x00;
-                while (!(IFG2 & UCB0TXIFG));  // USCI_B0 TX buffer ready?
-            }
-            else { // Bit = 0
-                UCB0TXBUF = 0x7E;
-                while (!(IFG2 & UCB0TXIFG));  // USCI_B0 TX buffer ready?
-                UCB0TXBUF = 0x00;
-                while (!(IFG2 & UCB0TXIFG));  // USCI_B0 TX buffer ready?
-            }
-        }
-    }
-    if (wait_for_completion)
-        while (!(IFG2 & UCB0RXIFG));  // USCI_B0 RX buffer ready? (indicates transfer complete)
-}
-
 static void rgb_send_row(const char *row, uint8_t *color, bool reversed, bool last_row){
     int i;
     if (reversed) {
@@ -124,4 +154,5 @@ void rgb_send_frame(const char (*frame)[2], uint8_t *color, int color_id, uint8_
     }
     rgb_send_row(frame[15], color, false, true);
 }
+*/
 
