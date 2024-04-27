@@ -1,3 +1,5 @@
+// This is a test code we used for setting up a master in SPI communication
+
 #include <msp430.h>
 
 volatile char received_ch = 0;
