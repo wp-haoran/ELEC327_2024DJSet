@@ -1,3 +1,5 @@
+// This is a test code we used for the ultrasonic distance sensor
+
 #include <msp430.h> 
 #include <stdlib.h>
 #include <stdio.h>
