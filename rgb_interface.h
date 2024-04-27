@@ -30,9 +30,14 @@
  */
 void rgb_init_spi(void);
 
+/**
+ * @brief Randomly generates GRB color values.
+ *
+ * @param seed An integer to determine the random color generator's seed.
+ * @param color An array of length 3 allocated for storing the color value.
+ * @param brightness An integer 3-6 (inclusive) indicating brightness level.
+ */
 static void rgb_generate_color(int seed, uint8_t *color, int brightness);
-
-void rgb_generate_frame(uint8_t *color, int brightness);
 
 /**
  * @brief Sends color to serial buffer for sending to each LED.
@@ -45,6 +50,16 @@ void rgb_generate_frame(uint8_t *color, int brightness);
  * @return Void.
  */
 static void rgb_send_color(const uint8_t *color, bool wait_for_completion);
+
+/**
+ * @brief Generates random colors and displays them on the LED matrix.
+ * 
+ * Primary function for interfacing with the LED matrix.
+ *
+ * @param color An array of length 3 allocated for storing the color value.
+ * @param brightness An integer 3-6 (inclusive) indicating brightness level.
+ */
+void rgb_generate_frame(uint8_t *color, int brightness);
 
 /**
  * @brief Sets the color to be passed into the LED matrix.
