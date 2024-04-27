@@ -18,8 +18,8 @@
 
 void rgb_init_spi(void){
     // COPI on p1.7, SCLK on p1.4
-    P1SEL = BIT4 + BIT7;
-    P1SEL2 = BIT4 + BIT7;
+    P1SEL |= BIT4 + BIT7;
+    P1SEL2 |= BIT4 + BIT7;
 
     // Set clock frequency to 8MHz
     BCSCTL1 = CALBC1_8MHZ;
@@ -42,19 +42,25 @@ void rgb_init_spi(void){
 static void rgb_generate_color(int seed, uint8_t *color, int brightness) {
     switch(brightness) {
     case 3 : ; // low brightness
+        color[0] = seed & 0x03;
+        color[1] = (seed >> 2) & 0x03;
+        color[2] = (seed >> 4) & 0x03;
+        break;
+    case 4 : ; // medium brightness
         color[0] = seed & 0x07;
         color[1] = (seed >> 3) & 0x07;
         color[2] = (seed >> 6) & 0x07;
         break;
-    case 5 : ; // high brightness
-        color[0] = seed & 0x1F;
-        color[1] = (seed >> 5) & 0x1F;
-        color[2] = (seed >> 10) & 0x1F;
+    case 5 : ; // med-high brightness
+        color[0] = seed & 0x07 + seed & 0x03;
+        color[1] = (seed >> 3) & 0x07 + (seed >> 2) & 0x03;
+        color[2] = (seed >> 6) & 0x07 + (seed >> 4) & 0x03;
         break;
-    default : ; // medium brightness
+    case 6 : ; // high brightness
         color[0] = seed & 0x0F;
         color[1] = (seed >> 4) & 0x0F;
         color[2] = (seed >> 8) & 0x0F;
+        break;
     }
 }
 
