@@ -15,10 +15,7 @@ The diagram below illustrates how the components in our system are connected.
 ## Pitch Control and Output
 Pitch is controlled by one of the distance sensors, i.e. the farther the distance sensor detects an object, the higher the pitch is set in the resulting output sound. This pitch is set by pulse-width modulation. The output is discretized into notes varying between two octaves, specifically C3 and C5, and played through piezo buzzers. We are using SPI to establish a master and slave connection between two MSP430 boards. This was done to double the amount of timers we had access to, but also to address how there were overlapping pin connections required by the ultrasonic distance sensor and piezo buzzer. The master MSP430 board takes the distance sensor reading and assigns it to an 8-bit message based on the range it falls under, which then gets sent as a transmit buffer to the slave. The slave MSP430 board takes the receive buffer and plays an output frequency on the buzzer based on the message. 
 
-The following buttons add additional functionality:
-- Minor Triad Button: when held, sets output sound to minor triad. (if we have time)
-- Major Triad Button: when held, sets output sound to major triad.
-The latter two chords are output through multiple piezo buzzers.
+The button connected to the slave changes the octave in which the note is being played.
 
 ## Volume and Brightness Control
 Volume is controlled by a potentiometer, i.e. the smaller the set resistance, the larger the volume is set in the resulting output sound. This volume is set by pulse-width modulation and dicretized into various levels. The brightness of the LED matrix is scaled with the detected volume.
