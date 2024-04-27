@@ -15,11 +15,15 @@ Pitch is controlled by one of the distance sensors, i.e. the farther the distanc
 
 The button connected to the slave changes the octave in which the note is being played.
 
+Files used for pitch control and output: master_ultrasonic.c, slave_buzzer.c
+
 ## Volume and Brightness Control
 Volume is controlled by a potentiometer, i.e. the smaller the set resistance, the larger the volume is set in the resulting output sound. This volume is set by pulse-width modulation and dicretized into various levels. The brightness of the LED matrix is scaled with the detected volume.
 
 The following buttons add additional functionality:
 - Mute Button: on press, turns off the output sound.
+
+- File used for brightness control: slave_led_matrix.c
 
 ## LED Display Control
 The LED Matrix plays a pattern of our choosing and changes brightness in reponse to the distance closent to the ultrasonic sensor hooked to the respective Master MSP430. We coded 4 levels of brightness. 
