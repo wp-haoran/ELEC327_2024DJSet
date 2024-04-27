@@ -3,7 +3,7 @@ This repository holds the code for our (Minatel, Huang, Nguyen, Pan) final proje
 
 We sought to construct a DJ set, consisting of a theremin operated with ultrasonic distance sensors and a LED matrix that plays animations determined by the DJ. 
 
-The link to a demonstration of the project is provided [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ).
+The link to a demonstration of the project is provided [here](https://rice.box.com/s/wwp57yu2822f0gqisk5gadgmjqpktd3a).
 
 The functionalities of the DJ set are outlined below.
 
@@ -21,12 +21,10 @@ Files used for pitch control and output: master_ultrasonic.c, slave_buzzer.c
 Volume is controlled by a potentiometer, i.e. the smaller the set resistance, the larger the volume is set in the resulting output sound. This volume is set by pulse-width modulation and dicretized into various levels. The brightness of the LED matrix is scaled with the detected volume.
 
 The following buttons add additional functionality:
-- Mute Button: on press, turns off the output sound.
-
 - File used for brightness control: master_led_matrix.c
 
 ## LED Display Control
-The LED Matrix plays a pattern of our choosing and changes brightness in reponse to the distance closest to the ultrasonic sensor hooked to the respective Master MSP430. We coded 4 levels of brightness. 
+The LED Matrix plays a pattern of our choosing and changes brightness in reponse to the distance closest to the ultrasonic sensor hooked to the respective Master MSP430. We coded 4 levels of brightness. We also set up P1.3 to be able to pause and continue the LED matrix animation upon button press.
 
 ## Trials And Tribulations
 - We wanted to play the Bad Apple video on the LED matrix, but the MSP430 has limited storage, so we had to figure out a way to store data on the laptop and pass it through to the MSP. We decided on a UART to USB cable, but our cable was not compatible hardware-wise with the RX function of the MSP, resulting in successful transmission but inability for the MSP to relay the information further. As a result, we decided to generate our own frames instead of relying on stored video frames.
