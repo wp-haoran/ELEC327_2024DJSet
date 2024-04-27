@@ -11,7 +11,7 @@ The functionalities of the DJ set are outlined below.
 The diagram in our files illustrates how the components in our system are connected.
 
 ## Pitch Control and Output
-Pitch is controlled by one of the distance sensors, i.e. the farther the distance sensor detects an object, the higher the pitch is set in the resulting output sound. This pitch is set by pulse-width modulation. The output is discretized into notes varying between two octaves, specifically C3 and C5, and played through piezo buzzers. We are using SPI to establish a master and slave connection between two MSP430 boards. This was done to double the amount of timers we had access to, but also to address how there were overlapping pin connections required by the ultrasonic distance (https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf) sensor and piezo buzzer. The master MSP430 board takes the distance sensor reading and assigns it to an 8-bit message based on the range it falls under, which then gets sent as a transmit buffer to the slave. The slave MSP430 board takes the receive buffer and plays an output frequency on the buzzer based on the message. 
+Pitch is controlled by one of the distance sensors, i.e. the farther the distance sensor detects an object, the higher the pitch is set in the resulting output sound. This pitch is set by pulse-width modulation. The output is discretized into notes varying between two octaves, specifically C3 and C5, and played through piezo buzzers. We are using SPI to establish a master and slave connection between two MSP430 boards. This was done to double the amount of timers we had access to, but also to address how there were overlapping pin connections required by the ultrasonic distance sensor and piezo buzzer. The master MSP430 board takes the distance sensor reading and assigns it to an 8-bit message based on the range it falls under, which then gets sent as a transmit buffer to the slave. The slave MSP430 board takes the receive buffer and plays an output frequency on the buzzer based on the message. 
 
 The button connected to the slave changes the octave in which the note is being played. On button press, we toggle between (default) 3rd octave and pulsating 5th octave notes. The choice to pulsate and skip the 4th octave was deliberately done to make the change more obvious to perceive, which helped in debugging as well and contributed to a better DJ rave atmosphere. 
 
@@ -31,5 +31,6 @@ The LED Matrix plays a pattern of our choosing and changes brightness in respons
 - At one point we postulated that button interrupts would cause difficulties when operating concurrently with watchdog timer and a large amount of serial info being sent across the MSPs, so we experimented with moving the button functionality to the master, where the strain on the WDT was not as heavy. However, this turned out to be a non-issue and so our button functionality remained in the slave code.
 - 
 ## Datasheets for components
-WS2812B 50mm x 50mm LEDs https://cdn-shop.adafruit.com/datasheets/WS2812B.pdf
-FT232RL USB-UART Converter IC https://ftdichip.com/wp-content/uploads/2020/08/DS_FT232R.pdf
+- WS2812B 50mm x 50mm LEDs https://cdn-shop.adafruit.com/datasheets/WS2812B.pdf
+- FT232RL USB-UART Converter IC https://ftdichip.com/wp-content/uploads/2020/08/DS_FT232R.pdf
+- Ultrasonic Distance Sensor https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf
