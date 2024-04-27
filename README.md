@@ -24,7 +24,7 @@ The following buttons add additional functionality:
 - File used for brightness control: master_led_matrix.c
 
 ## LED Display Control
-The LED Matrix plays a pattern of our choosing and changes brightness in reponse to the distance closest to the ultrasonic sensor hooked to the respective Master MSP430. We coded 4 levels of brightness. We also set up P1.3 to be able to pause and continue the LED matrix animation upon button press.
+The LED Matrix plays a pattern of our choosing and changes brightness in response to the distance closest to the ultrasonic sensor hooked to the respective Master MSP430. We coded 4 levels of brightness. We also set up P1.3 to be able to pause and continue the LED matrix animation upon button press. We also implemented a button to pause the current LED matrix animation, in case there is any pattern we like.
 
 ## Trials And Tribulations
 - We wanted to play the Bad Apple video on the LED matrix, but the MSP430 has limited storage, so we had to figure out a way to store data on the laptop and pass it through to the MSP. We decided on a UART to USB cable, but our cable was not compatible hardware-wise with the RX function of the MSP, resulting in successful transmission but inability for the MSP to relay the information further. As a result, we decided to generate our own frames instead of relying on stored video frames.
