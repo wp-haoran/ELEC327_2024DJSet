@@ -22,8 +22,4 @@ The following buttons add additional functionality:
 - Mute Button: on press, turns off the output sound.
 
 ## LED Display Control
-When the device is on, the LED matrix enters the default state where an animation based on the music video for _[Bad Apple!!](https://www.youtube.com/watch?v=9lNZ_Rnr7Jc)_ plays indefinitely. The volume set by the potentiometer controls the brightness of the LEDs in the LED matrix. 
-
-The following buttons add additional functionality:
-- Animation Control Button: on press, enters or exits a state in which the animation is paused and the frame can be controlled by adjusting pitch. (if we have time)
-- Color Button: on press, changes the color of the LEDs in the animation in a set order.
+The LED Matrix plays a pattern of our choosing and changes brightness in reponse to the distance closent to the ultrasonic sensor hooked to the respective Master MSP430. We coded 4 levels of brightness. 
